@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vertex Gold</title>
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+    
+    :root {
+      --bg: #050505;
+      --text: #f5f5f0;
+      --gold-1: #ffe08a;
+      --gold-3: #cfa335;
+      --panel: #0d0d0d;
+      --gray: #888;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { 
+      min-height: 100%; 
+      background: var(--bg); 
+      color: var(--text); 
+      font-family: 'Space Mono', monospace; 
+      overflow-x: hidden;
+    }
+
+    /* Particle Background */
+    #particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Content above particles */
+    .page, .nav, .modal, .add-modal {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Gold Gradient Text */
+    .gold-text {
+      background: linear-gradient(120deg, #fff, var(--gold-1), #fff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shine 6s linear infinite;
+    }
+
+    @keyframes shine { to { background-position: 200% center; } }
+
+    /* Navigation - Astriex Style with Gold Accents */
+    .nav { 
+      position: fixed; 
+      bottom: 2rem; 
+      left: 50%; 
+      transform: translateX(-50%); 
+      display: flex; 
+      z-index: 300; 
+      background: rgba(13, 13, 13, 0.95); 
+      border: 1px solid rgba(255, 215, 120, 0.2); 
+      padding: 0.5rem 0.6rem; 
+      gap: 0.25rem;
+      border-radius: 16px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 0 35px rgba(255, 215, 120, 0.15);
+    }
+
+    .nav-btn { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 0.3rem; 
+      width: 56px; 
+      height: 52px; 
+      background: transparent; 
+      border: none; 
+      cursor: pointer; 
+      color: #555; 
+      transition: all 0.15s; 
+      text-decoration: none; 
+      position: relative;
+      border-radius: 12px;
+    }
+
+    .nav-btn:hover { 
+      color: var(--gold-1); 
+      background: rgba(255, 215, 120, 0.1); 
+    }
+
+    .nav-btn.active { 
+      color: var(--gold-1); 
+    }
+
+    .nav-btn.active::after { 
+      content: ''; 
+      position: absolute; 
+      bottom: 4px; 
+      left: 50%; 
+      transform: translateX(-50%); 
+      width: 4px; 
+      height: 4px; 
+      background: var(--gold-1); 
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--gold-1);
+    }
+
+    .nav-btn svg { 
+      width: 18px; 
+      height: 18px; 
+      stroke: currentColor; 
+      fill: none; 
+      stroke-width: 1.5; 
+      stroke-linecap: round; 
+      stroke-linejoin: round; 
+    }
+
+    .nav-label { 
+      font-size: 0.45rem; 
+      letter-spacing: 0.1em; 
+      text-transform: uppercase; 
+    }
+
+    /* Page Layout */
+    .page { 
+      min-height: 100vh; 
+      padding: 3rem 2rem 8rem; 
+      max-width: 1200px; 
+      margin: 0 auto; 
+      display: none;
+    }
+
+    .page.active { display: block; }
+
+    .page-header { 
+      margin-bottom: 2rem; 
+      animation: fade-up 0.6s ease both; 
+      text-align: center;
+    }
+
+    .page-title { 
+      font-family: 'Instrument Serif', serif; 
+      font-style: italic; 
+      font-size: clamp(2rem, 5vw, 3.5rem); 
+      letter-spacing: -0.02em; 
+      margin-bottom: 0.4rem;
+    }
+
+    .page-sub { 
+      font-size: 0.6rem; 
+      color: var(--gray); 
+      letter-spacing: 0.2em; 
+      text-transform: uppercase; 
+    }
+
+    /* Controls */
+    .controls { 
+      display: flex; 
+      gap: 0.75rem; 
+      margin-bottom: 1.5rem; 
+      animation: fade-up 0.6s 0.1s ease both; 
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .search-wrap { 
+      display: flex; 
+      flex: 1; 
+      min-width: 200px; 
+      max-width: 400px; 
+      border: 1px solid rgba(255, 215, 120, 0.35); 
+      background: var(--panel); 
+      transition: border-color 0.2s;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .search-wrap:focus-within { 
+      border-color: var(--gold-1);
+      box-shadow: 0 0 20px rgba(255, 215, 120, 0.2);
+    }
+
+    .search-wrap input { 
+      flex: 1; 
+      background: transparent; 
+      border: none; 
+      outline: none; 
+      color: var(--text); 
+      font-family: 'Space Mono', monospace; 
+      font-size: 0.75rem; 
+      padding: 0.75rem 1rem; 
+    }
+
+    .search-wrap input::placeholder { 
+      color: #555; 
+    }
+
+    .cat-btn { 
+      font-family: 'Space Mono', monospace; 
+      font-size: 0.55rem; 
+      letter-spacing: 0.1em; 
+      text-transform: uppercase; 
+      padding: 0.5rem 0.9rem; 
+      border: 1px solid rgba(255, 215, 120, 0.2); 
+      background: transparent; 
+      color: #555; 
+      cursor: pointer; 
+      transition: all 0.15s; 
+      white-space: nowrap;
+      border-radius: 14px;
+    }
+
+    .cat-btn:hover, .cat-btn.active { 
+      border-color: var(--gold-1); 
+      color: var(--gold-1); 
+      background: rgba(255, 215, 120, 0.1);
+      box-shadow: 0 0 20px rgba(255, 215, 120, 0.3);
+    }
+
+    /* Grid Layouts */
+    .grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+      gap: 16px; 
+      background: transparent; 
+      padding: 0.5rem; 
+      animation: fade-up 0.6s 0.2s ease both; 
+    }
+
+    @media (min-width: 900px) {
+      .grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+    }
+
+    /* Cards - Games & Apps */
+    .card { 
+      background: linear-gradient(180deg, #1a1306, #0b0b0b);
+      cursor: pointer; 
+      position: relative; 
+      overflow: hidden; 
+      border-radius: 16px;
+      transition: all 0.35s cubic-bezier(.2,.8,.2,1);
+      border: 1px solid rgba(255, 215, 120, 0.18);
+    }
+
+    .card:hover { 
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 20px 50px rgba(0,0,0,.9), 0 0 40px rgba(255,215,120,.3);
+      border-color: rgba(255, 215, 120, 0.4);
+    }
+
+    .card:hover .card-overlay { 
+      opacity: 1; 
+    }
+
+    .card-thumb { 
+      width: 100%; 
+      aspect-ratio: 1; 
+      object-fit: cover; 
+      display: block; 
+      transition: all 0.25s;
+      border-radius: 16px;
+    }
+
+    .card:hover .card-thumb {
+      filter: brightness(0.7);
+    }
+
+    .card-no-thumb { 
+      width: 100%; 
+      aspect-ratio: 1; 
+      background: rgba(0,0,0,0.3); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      border-radius: 16px;
+    }
+
+    .card-no-thumb svg { 
+      width: 28px; 
+      height: 28px; 
+      stroke: #2a2a2a; 
+      fill: none; 
+      stroke-width: 1.5; 
+    }
+
+    .card-overlay { 
+      position: absolute; 
+      inset: 0; 
+      background: linear-gradient(to top, rgba(0,0,0,0.95) 40%, transparent 100%); 
+      opacity: 0; 
+      transition: opacity 0.2s; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: flex-end; 
+      padding: 0.75rem;
+      border-radius: 16px;
+    }
+
+    .card-play { 
+      width: 32px; 
+      height: 32px; 
+      border: 1px solid rgba(255, 215, 120, 0.6); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      margin-bottom: 0.5rem;
+      border-radius: 50%;
+      background: rgba(255, 215, 120, 0.1);
+    }
+
+    .card-play svg { 
+      width: 12px; 
+      height: 12px; 
+      fill: var(--gold-1); 
+      stroke: none; 
+    }
+
+    .card-title { 
+      font-size: 0.65rem; 
+      letter-spacing: 0.05em; 
+      line-height: 1.3; 
+      color: var(--gold-1);
+      font-weight: 700;
+    }
+
+    .card-meta { 
+      font-size: 0.5rem; 
+      color: var(--gray); 
+      margin-top: 0.2rem; 
+    }
+
+    /* Movie Cards */
+    .movie-card {
+      background: transparent;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      border-radius: 10px;
+      transition: filter 0.2s;
+    }
+
+    .movie-card:hover .movie-overlay { opacity: 1; }
+    .movie-card:hover .movie-poster { filter: grayscale(0%); }
+    
+    .movie-poster {
+      width: 100%;
+      aspect-ratio: 2/3;
+      object-fit: cover;
+      display: block;
+      filter: grayscale(30%);
+      transition: filter 0.2s;
+      border-radius: 10px;
+    }
+
+    .movie-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.95) 40%, transparent 100%);
+      opacity: 0;
+      transition: opacity 0.2s;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0.75rem;
+      border-radius: 10px;
+    }
+
+    .movie-play {
+      width: 32px;
+      height: 32px;
+      border: 1px solid rgba(255, 215, 120, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .movie-play svg { width: 12px; height: 12px; fill: var(--gold-1); stroke: none; }
+    .movie-title-overlay { font-size: 0.6rem; letter-spacing: 0.05em; line-height: 1.3; color: var(--text); }
+    .movie-year-overlay { font-size: 0.5rem; color: var(--gray); margin-top: 0.2rem; }
+    .movie-rating {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      font-size: 0.5rem;
+      background: rgba(0,0,0,0.85);
+      padding: 0.2rem 0.4rem;
+      color: var(--gold-1);
+      border-radius: 4px;
+    }
+
+    /* Special Cards */
+    .suggest-card, .add-card {
+      background: rgba(255, 215, 120, 0.05);
+      border: 2px dashed rgba(255, 215, 120, 0.2);
+      border-radius: 16px;
+      cursor: pointer;
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .suggest-card:hover, .add-card:hover {
+      border-color: rgba(255, 215, 120, 0.5);
+      background: rgba(255, 215, 120, 0.1);
+      transform: translateY(-4px);
+    }
+
+    .suggest-card svg, .add-card svg {
+      width: 28px;
+      height: 28px;
+      stroke: rgba(255, 215, 120, 0.4);
+      fill: none;
+      stroke-width: 1.5;
+    }
+
+    .suggest-card:hover svg, .add-card:hover svg {
+      stroke: var(--gold-1);
+    }
+
+    .suggest-label, .add-label {
+      font-size: 0.5rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255, 215, 120, 0.4);
+    }
+
+    .suggest-card:hover .suggest-label, .add-card:hover .add-label {
+      color: var(--gold-1);
+    }
+
+    /* Loader */
+    .loader { 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      padding: 4rem; 
+      gap: 0.5rem; 
+    }
+    .loader-dot { 
+      width: 6px; 
+      height: 6px; 
+      background: rgba(255, 215, 120, 0.3); 
+      border-radius: 50%; 
+      animation: pulse 1s ease infinite; 
+    }
+    .loader-dot:nth-child(2) { animation-delay: 0.2s; }
+    .loader-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse { 0%,100%{opacity:0.2;transform:scale(0.8)}50%{opacity:1;transform:scale(1)} }
+
+    /* Pagination */
+    .pagination { 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 0.5rem; 
+      margin-top: 2rem; 
+      padding-bottom: 2rem; 
+    }
+    .page-btn { 
+      font-family: 'Space Mono', monospace; 
+      font-size: 0.6rem; 
+      padding: 0.5rem 0.9rem; 
+      border: 1px solid rgba(255, 215, 120, 0.2); 
+      background: transparent; 
+      color: #555; 
+      cursor: pointer; 
+      transition: all 0.15s;
+      border-radius: 8px;
+    }
+    .page-btn:hover:not(:disabled) { 
+      border-color: var(--gold-1); 
+      color: var(--gold-1);
+      background: rgba(255, 215, 120, 0.1);
+    }
+    .page-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+    .page-info { font-size: 0.55rem; color: var(--gray); padding: 0 0.5rem; }
+
+    /* Modals */
+    .modal { 
+      display: none; 
+      position: fixed; 
+      inset: 0; 
+      background: rgba(0,0,0,0.98); 
+      z-index: 500; 
+      flex-direction: column; 
+    }
+    .modal.open { display: flex; }
+
+    .modal-player { 
+      flex: 1; 
+      display: flex; 
+      flex-direction: column; 
+      min-width: 0; 
+    }
+    
+    .modal-header { 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      padding: 0.75rem 1.25rem; 
+      border-bottom: 1px solid rgba(255, 215, 120, 0.2); 
+      flex-shrink: 0; 
+      background: rgba(5,5,5,0.95);
+    }
+
+    .modal-info { flex: 1; min-width: 0; }
+    .modal-title { 
+      font-family: 'Instrument Serif', serif; 
+      font-style: italic; 
+      font-size: 1.1rem; 
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis;
+      color: var(--gold-1);
+    }
+    .modal-meta { 
+      font-size: 0.5rem; 
+      color: var(--gray); 
+      letter-spacing: 0.1em; 
+      margin-top: 0.15rem; 
+    }
+    
+    .modal-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+    .modal-btn { 
+      background: linear-gradient(135deg, var(--gold-1), var(--gold-3));
+      border: none;
+      color: #000; 
+      font-family: 'Space Mono', monospace; 
+      font-size: 0.55rem; 
+      letter-spacing: 0.1em; 
+      text-transform: uppercase; 
+      padding: 0.45rem 0.8rem; 
+      cursor: pointer; 
+      transition: all 0.15s; 
+      white-space: nowrap;
+      border-radius: 8px;
+      font-weight: 700;
+    }
+    .modal-btn:hover { 
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px rgba(255, 215, 120, 0.5);
+    }
+
+    .modal-body { flex: 1; position: relative; background: #000; }
+    .player-iframe { width: 100%; height: 100%; border: none; display: block; }
+    .modal-loading { 
+      position: absolute; 
+      inset: 0; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 0.5rem; 
+      background: var(--bg); 
+      z-index: 10; 
+    }
+
+    /* Episode Sidebar for TV */
+    .episode-sidebar { 
+      width: 280px; 
+      flex-shrink: 0; 
+      border-left: 1px solid rgba(255, 215, 120, 0.2); 
+      display: flex; 
+      flex-direction: column; 
+      background: rgba(5,5,5,0.95);
+    }
+    .episode-sidebar.hidden { display: none; }
+    .sidebar-header { 
+      padding: 0.9rem 1rem; 
+      border-bottom: 1px solid rgba(255, 215, 120, 0.2); 
+      flex-shrink: 0; 
+    }
+    .sidebar-label { 
+      font-size: 0.5rem; 
+      letter-spacing: 0.2em; 
+      text-transform: uppercase; 
+      color: var(--gray); 
+      margin-bottom: 0.5rem; 
+    }
+    .season-select { 
+      width: 100%; 
+      background: var(--panel); 
+      border: 1px solid rgba(255, 215, 120, 0.2); 
+      color: var(--text); 
+      font-family: 'Space Mono', monospace; 
+      font-size: 0.65rem; 
+      padding: 0.45rem 0.7rem; 
+      outline: none; 
+      cursor: pointer;
+      border-radius: 8px;
+    }
+    .season-select:focus { border-color: var(--gold-1); }
+    .episode-list { flex: 1; overflow-y: auto; }
+    .episode-list::-webkit-scrollbar { width: 3px; }
+    .episode-list::-webkit-scrollbar-thumb { background: rgba(255, 215, 120, 0.3); }
+    .ep-item { 
+      display: flex; 
+      align-items: center; 
+      gap: 0.75rem; 
+      padding: 0.65rem 1rem; 
+      cursor: pointer; 
+      transition: all 0.15s; 
+      border-bottom: 1px solid rgba(255, 215, 120, 0.05);
+    }
+    .ep-item:hover { background: rgba(255, 215, 120, 0.05); }
+    .ep-item.active { 
+      background: rgba(255, 215, 120, 0.1); 
+      border-left: 2px solid var(--gold-1); 
+      padding-left: calc(1rem - 2px); 
+    }
+    .ep-num { 
+      font-size: 0.5rem; 
+      color: var(--gray); 
+      min-width: 28px; 
+      flex-shrink: 0; 
+    }
+    .ep-info { flex: 1; min-width: 0; }
+    .ep-name { 
+      font-size: 0.58rem; 
+      color: var(--text); 
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis; 
+    }
+    .ep-air { font-size: 0.48rem; color: var(--gray); margin-top: 0.15rem; }
+    .ep-play { 
+      width: 20px; 
+      height: 20px; 
+      border: 1px solid rgba(255, 215, 120, 0.3); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      flex-shrink: 0;
+      border-radius: 4px;
+    }
+    .ep-item:hover .ep-play, .ep-item.active .ep-play { 
+      border-color: var(--gold-1); 
+      background: rgba(255, 215, 120, 0.1);
+    }
+    .ep-play svg { width: 7px; height: 7px; fill: var(--gold-1); stroke: none; }
+    .ep-loading { padding: 2rem; text-align: center; font-size: 0.6rem; color: var(--gray); }
+
+    /* Add Game/App Modal */
+    .add-modal { 
+      display: none; 
+      position: fixed; 
+      inset: 0; 
+      background: rgba(0,0,0,0.9); 
+      z-index: 600; 
+      align-items: center; 
+      justify-content: center; 
+    }
+    .add-modal.open { display: flex; }
+    .add-box { 
+      background: var(--panel); 
+      border: 1px solid rgba(255, 215, 120, 0.2); 
+      width: 100%; 
+      max-width: 480px; 
+      padding: 2rem; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 1.25rem; 
+      animation: fade-up 0.3s ease both;
+      border-radius: 20px;
+    }
+    .add-box-title { 
+      font-family: 'Instrument Serif', serif; 
+      font-style: italic; 
+      font-size: 1.5rem; 
+      color: var(--gold-1);
+      text-align: center;
+    }
+    .add-tabs { 
+      display: flex; 
+      gap: 0; 
+      border: 1px solid rgba(255, 215, 120, 0.2);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .add-tab { 
+      flex: 1; 
+      background: transparent; 
+      border: none; 
+      color: var(--gray); 
+      font-family: 'Space Mono', monospace; 
+      font-size: 0.55rem; 
+      letter-spacing: 0.1em; 
+      text-transform: uppercase; 
+      padding: 0.6rem 0.5rem; 
+      cursor: pointer; 
+      transition: all 0.15s; 
+      border-right: 1px solid rgba(255, 215, 120, 0.1);
+    }
+    .add-tab:last-child { border-right: none; }
+    .add-tab.active { 
+      background: rgba(255, 215, 120, 0.1); 
+      color: var(--gold-1); 
+    }
+    .add-tab:hover:not(.active) { color: var(--text); }
+    .add-field { display: flex; flex-direction: column; gap: 0.4rem; }
+    .add-label { 
+      font-size: 0.5rem; 
+      letter-spacing: 0.15em; 
+      text-transform: uppercase; 
+      color: var(--gray); 
+    }
+    .add-input { 
+      background: rgba(0,0,0,0.4); 
+      border: 1px solid rgba(255, 215, 120, 0.2); 
+      color: var(--text); 
+      font-family: 'Space Mono', monospace; 
+      font-size: 0.65rem; 
+      padding: 0.6rem 0.8rem; 
+      outline: none; 
+      width: 100%;
+      border-radius: 8px;
+    }
+    .add-input:focus { border-color: var(--gold-1); }
+    .add-input::placeholder { color: #444; }
+    .add-textarea { resize: vertical; min-height: 100px; font-size: 0.6rem; line-height: 1.5; }
+    .add-pane { display: none; flex-direction: column; gap: 1rem; }
+    .add-pane.active { display: flex; }
+    .add-thumb-row { display: flex; gap: 0.75rem; align-items: flex-start; }
+    .add-thumb-preview { 
+      width: 64px; 
+      height: 64px; 
+      border-radius: 8px; 
+      object-fit: cover; 
+      border: 1px solid rgba(255, 215, 120, 0.2); 
+      flex-shrink: 0; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      background: rgba(0,0,0,0.3); 
+      overflow: hidden; 
+    }
+    .add-thumb-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .add-thumb-preview svg { width: 20px; height: 20px; stroke: rgba(255, 215, 120, 0.3); fill: none; }
+    .add-row-btns { display: flex; gap: 0.5rem; justify-content: flex-end; }
+    .add-btn { 
+      font-family: 'Space Mono', monospace; 
+      font-size: 0.6rem; 
+      letter-spacing: 0.08em; 
+      text-transform: uppercase; 
+      padding: 0.55rem 1.1rem; 
+      border: 1px solid rgba(255, 215, 120, 0.2); 
+      background: transparent; 
+      color: var(--gray); 
+      cursor: pointer; 
+      transition: all 0.15s;
+      border-radius: 8px;
+    }
+    .add-btn:hover { border-color: var(--gold-1); color: var(--gold-1); }
+    .add-btn.primary { 
+      background: linear-gradient(135deg, var(--gold-1), var(--gold-3)); 
+      color: #000 !important; 
+      border-color: transparent;
+      font-weight: 700;
+    }
+    .add-btn.primary:hover { 
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px rgba(255, 215, 120, 0.4);
+    }
+    .upload-btn { 
+      display: inline-flex; 
+      align-items: center; 
+      gap: 0.5rem; 
+      font-family: 'Space Mono', monospace; 
+      font-size: 0.6rem; 
+      letter-spacing: 0.08em; 
+      text-transform: uppercase; 
+      padding: 0.55rem 1rem; 
+      border: 1px dashed rgba(255, 215, 120, 0.25); 
+      background: transparent; 
+      color: var(--gray); 
+      cursor: pointer; 
+      transition: all 0.15s; 
+      width: 100%; 
+      justify-content: center;
+      border-radius: 8px;
+    }
+    .upload-btn:hover { border-color: var(--gold-1); color: var(--gold-1); }
+    .upload-chosen { font-size: 0.55rem; color: var(--gray); text-align: center; margin-top: -0.5rem; }
+
+    /* Delete button for user items */
+    .card-delete { 
+      position: absolute; 
+      top: 6px; 
+      right: 6px; 
+      width: 22px; 
+      height: 22px; 
+      background: rgba(0,0,0,0.7); 
+      border: 1px solid rgba(255, 215, 120, 0.3); 
+      color: var(--gold-1); 
+      font-size: 0.6rem; 
+      display: none; 
+      align-items: center; 
+      justify-content: center; 
+      cursor: pointer; 
+      border-radius: 4px; 
+      z-index: 10; 
+    }
+    .card:hover .card-delete { display: flex; }
+
+    /* Corner branding */
+    .corner { 
+      position: fixed; 
+      font-size: 0.5rem; 
+      letter-spacing: 0.15em; 
+      text-transform: uppercase; 
+      color: rgba(255, 215, 120, 0.3);
+      z-index: 10;
+    }
+    .corner.tl { top: 1.5rem; left: 1.5rem; }
+    
+    @keyframes fade-up { from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)} }
+
+    /* Empty state */
+    .empty-state { 
+      grid-column: 1 / -1; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 1rem; 
+      padding: 5rem 2rem; 
+      text-align: center; 
+    }
+    .empty-title { 
+      font-family: 'Instrument Serif', serif; 
+      font-style: italic; 
+      font-size: 1.8rem; 
+      color: rgba(255, 215, 120, 0.3); 
+    }
+    .empty-sub { 
+      font-size: 0.55rem; 
+      color: var(--gray); 
+      letter-spacing: 0.2em; 
+      text-transform: uppercase; 
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .episode-sidebar { width: 100%; border-left: none; border-top: 1px solid rgba(255, 215, 120, 0.2); }
+      .modal { flex-direction: column; }
+      .nav { bottom: 1rem; }
+      .page { padding: 2rem 1rem 6rem; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+<span class="corner tl">Vertex Gold</span>
+
+<!-- GAMES PAGE -->
+<div class="page active" id="games-page">
+  <div class="page-header">
+    <h1 class="page-title gold-text">Games</h1>
+    <div class="page-sub">Select a game to play</div>
+  </div>
+
+  <div class="controls" id="games-controls" style="display:none">
+    <div class="search-wrap">
+      <input id="games-search" type="text" placeholder="search games..." autocomplete="off" spellcheck="false" />
+    </div>
+  </div>
+
+  <div class="loader" id="games-loader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div></div>
+  <div class="grid" id="games-grid"></div>
+</div>
+
+<!-- APPS PAGE -->
+<div class="page" id="apps-page">
+  <div class="page-header">
+    <h1 class="page-title gold-text">Apps</h1>
+    <div class="page-sub">Select an app to launch</div>
+  </div>
+
+  <div class="controls" id="apps-controls" style="display:none">
+    <div class="search-wrap">
+      <input id="apps-search" type="text" placeholder="search apps..." autocomplete="off" spellcheck="false" />
+    </div>
+  </div>
+
+  <div class="loader" id="apps-loader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div></div>
+  <div class="grid" id="apps-grid"></div>
+</div>
+
+<!-- MEDIA PAGE -->
+<div class="page" id="media-page">
+  <div class="page-header">
+    <h1 class="page-title gold-text">Media</h1>
+    <div class="page-sub">Movies & TV Shows</div>
+  </div>
+
+  <div class="controls">
+    <div class="search-wrap">
+      <input id="media-search" type="text" placeholder="search movies & shows..." autocomplete="off" spellcheck="false" />
+      <button onclick="doMediaSearch()" style="background: linear-gradient(135deg, var(--gold-1), var(--gold-3)); border: none; color: #000; padding: 0 1rem; font-family: 'Space Mono', monospace; font-size: 0.6rem; font-weight: 700; cursor: pointer;">Go</button>
+    </div>
+    <button class="cat-btn active" onclick="switchMediaTab(this,'movie')">Movies</button>
+    <button class="cat-btn" onclick="switchMediaTab(this,'tv')">TV Shows</button>
+    <button class="cat-btn" onclick="switchMediaTab(this,'trending')">Trending</button>
+  </div>
+
+  <div class="loader" id="media-loader" style="display:none"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div></div>
+  <div class="grid" id="media-grid"></div>
+  <div class="pagination" id="media-pagination" style="display:none">
+    <button class="page-btn" id="media-prev" onclick="changeMediaPage(-1)">← Prev</button>
+    <span class="page-info" id="media-page-info"></span>
+    <button class="page-btn" id="media-next" onclick="changeMediaPage(1)">Next →</button>
+  </div>
+</div>
+
+<!-- SETTINGS PAGE -->
+<div class="page" id="settings-page">
+  <div class="page-header">
+    <h1 class="page-title gold-text">Settings</h1>
+    <div class="page-sub">Customize your experience</div>
+  </div>
+  
+  <div style="max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem; animation: fade-up 0.6s ease both;">
+    <div style="background: var(--panel); border: 1px solid rgba(255, 215, 120, 0.2); border-radius: 16px; padding: 1.5rem;">
+      <h3 style="font-family: 'Instrument Serif', serif; font-style: italic; color: var(--gold-1); margin-bottom: 1rem; font-size: 1.2rem;">Background Effect</h3>
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <button class="cat-btn active" onclick="setBackground('particles')" style="flex: 1; min-width: 120px;">Particles</button>
+        <button class="cat-btn" onclick="setBackground('minimal')" style="flex: 1; min-width: 120px;">Minimal</button>
+      </div>
+    </div>
+
+    <div style="background: var(--panel); border: 1px solid rgba(255, 215, 120, 0.2); border-radius: 16px; padding: 1.5rem;">
+      <h3 style="font-family: 'Instrument Serif', serif; font-style: italic; color: var(--gold-1); margin-bottom: 1rem; font-size: 1.2rem;">Data Management</h3>
+      <button class="add-btn danger" onclick="clearUserData()" style="width: 100%; border-color: rgba(200,80,80,0.5); color: rgba(255,150,150,0.8);">
+        Clear All User Games & Apps
+      </button>
+    </div>
+
+    <div style="background: var(--panel); border: 1px solid rgba(255, 215, 120, 0.2); border-radius: 16px; padding: 1.5rem; text-align: center;">
+      <div style="font-size: 0.6rem; color: var(--gray); letter-spacing: 0.1em; margin-bottom: 0.5rem;">VERTEX GOLD</div>
+      <div style="font-size: 0.5rem; color: #444;">Premium Gaming Portal</div>
+    </div>
+  </div>
+</div>
+
+<!-- Game/App Player Modal -->
+<div class="modal" id="player-modal">
+  <div class="modal-player">
+    <div class="modal-header">
+      <div class="modal-info">
+        <div class="modal-title" id="player-title"></div>
+        <div class="modal-meta" id="player-meta"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn" onclick="fullscreenPlayer()">⛶ Fullscreen</button>
+        <button class="modal-btn" onclick="closePlayer()">✕ Close</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <iframe class="player-iframe" id="player-iframe" allow="autoplay; fullscreen; gamepad; accelerometer; gyroscope; pointer-lock; microphone"></iframe>
+    </div>
+  </div>
+</div>
+
+<!-- Media Player Modal with Episodes -->
+<div class="modal" id="media-modal">
+  <div class="modal-player">
+    <div class="modal-header">
+      <div class="modal-info">
+        <div class="modal-title" id="media-modal-title"></div>
+        <div class="modal-meta" id="media-modal-meta"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn" onclick="fullscreenMedia()">⛶ Fullscreen</button>
+        <button class="modal-btn" onclick="closeMedia()">✕ Close</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-loading" id="media-loading"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div></div>
+      <iframe class="player-iframe" id="media-iframe" allowfullscreen allow="fullscreen; picture-in-picture; encrypted-media"></iframe>
+    </div>
+  </div>
+  <div class="episode-sidebar hidden" id="episode-sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-label">Season</div>
+      <select class="season-select" id="season-select" onchange="onSeasonChange()"></select>
+    </div>
+    <div class="episode-list" id="episode-list">
+      <div class="ep-loading">Loading...</div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Game/App Modal -->
+<div class="add-modal" id="add-modal">
+  <div class="add-box">
+    <div class="add-box-title" id="add-modal-title">Add Item</div>
+    
+    <div class="add-tabs">
+      <button class="add-tab active" onclick="switchAddTab('url')">Link / URL</button>
+      <button class="add-tab" onclick="switchAddTab('upload')">Upload HTML</button>
+      <button class="add-tab" onclick="switchAddTab('paste')">Paste HTML</button>
+    </div>
+
+    <div class="add-pane active" id="add-pane-url">
+      <div class="add-field">
+        <label class="add-label">URL</label>
+        <input class="add-input" id="add-url" type="text" placeholder="https://example.com" />
+      </div>
+    </div>
+
+    <div class="add-pane" id="add-pane-upload">
+      <label class="upload-btn" for="add-file-input">
+        <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        Choose HTML File
+      </label>
+      <input type="file" id="add-file-input" accept=".html,.htm" style="display:none" onchange="onFileChosen(event)" />
+      <div class="upload-chosen" id="upload-chosen"></div>
+    </div>
+
+    <div class="add-pane" id="add-pane-paste">
+      <div class="add-field">
+        <label class="add-label">Paste HTML Code</label>
+        <textarea class="add-input add-textarea" id="add-paste" placeholder="<!DOCTYPE html>..."></textarea>
+      </div>
+    </div>
+
+    <div class="add-field">
+      <label class="add-label">Title</label>
+      <input class="add-input" id="add-title" type="text" placeholder="My Item" />
+    </div>
+
+    <div class="add-field">
+      <label class="add-label">Thumbnail</label>
+      <div class="add-thumb-row">
+        <div class="add-thumb-preview" id="thumb-preview">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:0.5rem;">
+          <input class="add-input" id="add-thumb-url" type="text" placeholder="Image URL (optional)" oninput="previewThumb()" />
+          <label class="upload-btn" for="add-thumb-file" style="padding:0.4rem 0.75rem;font-size:0.5rem;">
+            Upload Image
+          </label>
+          <input type="file" id="add-thumb-file" accept="image/*" style="display:none" onchange="onThumbFile(event)" />
+        </div>
+      </div>
+    </div>
+
+    <div class="add-row-btns">
+      <button class="add-btn" onclick="closeAddModal()">Cancel</button>
+      <button class="add-btn primary" onclick="saveItem()">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- Navigation -->
+<nav class="nav">
+  <a class="nav-btn active" onclick="switchPage('games')" id="nav-games">
+    <svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4M8 10v4"/><circle cx="15" cy="11" r="1" fill="currentColor"/><circle cx="17" cy="13" r="1" fill="currentColor"/></svg>
+    <span class="nav-label">Games</span>
+  </a>
+  <a class="nav-btn" onclick="switchPage('apps')" id="nav-apps">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+    <span class="nav-label">Apps</span>
+  </a>
+  <a class="nav-btn" onclick="switchPage('media')" id="nav-media">
+    <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+    <span class="nav-label">Media</span>
+  </a>
+  <a class="nav-btn" onclick="switchPage('settings')" id="nav-settings">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    <span class="nav-label">Settings</span>
+  </a>
+</nav>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+  // Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyCAMwP6d2aZ7y1XK0YUujKmDg-50Tm_xQw",
+    authDomain: "goldhub-c1a71.firebaseapp.com",
+    databaseURL: "https://goldhub-c1a71-default-rtdb.firebaseio.com/",
+    projectId: "goldhub-c1a71",
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const connectionsRef = db.ref("connections");
+  const connectedRef = db.ref(".info/connected");
+
+  connectedRef.on("value", snap => {
+    if (snap.val() === true) {
+      const con = connectionsRef.push(true);
+      con.onDisconnect().remove();
+    }
+  });
+
+  // Global State
+  let currentPage = 'games';
+  let currentAddType = 'games'; // 'games' or 'apps'
+  
+  // Games Data
+  let allGames = [];
+  const priorityGames = ["[!] REQUEST GAME", "R0blox", "F0rtnite"];
+  
+  // Apps Data  
+  let allApps = [];
+  const priorityApps = ["[!] REQUEST APP", "YouTube", "Discord"];
+
+  // Media State
+  const API_KEY = "2d1351cf74f73892042699d0431b799a";
+  const TMDB_BASE = "https://api.themoviedb.org/3";
+  const IMG_BASE = "https://image.tmdb.org/t/p/w342";
+  let currentMediaTab = "movie";
+  let currentMediaPage = 1;
+  let totalMediaPages = 1;
+  let currentMediaQuery = "";
+  let activeTmdbId = null;
+  let activeSeason = 1;
+  let activeEpisode = 1;
+  let activeTitle = "";
+
+  // Add Modal State
+  let addTab = "url";
+  let uploadedFileContent = null;
+  let thumbDataUrl = null;
+
+  // Navigation
+  function switchPage(page) {
+    currentPage = page;
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(page + '-page').classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('nav-' + page).classList.add('active');
+    
+    if (page === 'games' && allGames.length === 0) loadGames();
+    if (page === 'apps' && allApps.length === 0) loadApps();
+    if (page === 'media') loadMedia();
+  }
+
+  // Particle Background
+  const canvas = document.getElementById("particles");
+  const ctx = canvas.getContext("2d");
+  let particlesArray = [];
+  const particleCount = 80;
+  const lineDistance = 120;
+  let mouse = { x: null, y: null };
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  canvas.addEventListener('mousemove', e => {
+    mouse.x = e.x;
+    mouse.y = e.y;
+  });
+
+  canvas.addEventListener('mouseleave', () => {
+    mouse.x = null;
+    mouse.y = null;
+  });
+
+  class Particle {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.size = Math.random() * 2 + 1;
+      this.speedX = (Math.random() - 0.5) * 0.5;
+      this.speedY = (Math.random() - 0.5) * 0.5;
+    }
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+      if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+      if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+    }
+    draw() {
+      ctx.fillStyle = 'rgba(255,200,90,0.25)';
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function connectParticles() {
+    for (let a = 0; a < particlesArray.length; a++) {
+      for (let b = a + 1; b < particlesArray.length; b++) {
+        const dx = particlesArray[a].x - particlesArray[b].x;
+        const dy = particlesArray[a].y - particlesArray[b].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < lineDistance) {
+          ctx.strokeStyle = `rgba(255,200,90,${1 - dist / lineDistance})`;
+          ctx.lineWidth = 0.7;
+          ctx.beginPath();
+          ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+          ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+          ctx.stroke();
+        }
+      }
+    }
+  }
+
+  function initParticles() {
+    particlesArray = [];
+    for (let i = 0; i < particleCount; i++) {
+      particlesArray.push(new Particle());
+    }
+  }
+
+  function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particlesArray.forEach(p => {
+      p.update();
+      p.draw();
+    });
+    connectParticles();
+    requestAnimationFrame(animateParticles);
+  }
+
+  initParticles();
+  animateParticles();
+
+  // Games Loading
+  async function loadGames() {
+    try {
+      const res = await fetch('https://raw.githubusercontent.com/ten8mystery/Vertex-Gold/main/data/games.json');
+      const data = await res.json();
+      
+      data.sort((a, b) => {
+        const ai = priorityGames.indexOf(a.name);
+        const bi = priorityGames.indexOf(b.name);
+        if (ai !== -1 && bi !== -1) return ai - bi;
+        if (ai !== -1) return -1;
+        if (bi !== -1) return 1;
+        return a.name.localeCompare(b.name);
+      });
+
+      allGames = data;
+      const userGames = getUserItems('games').map(g => ({ ...g, _user: true }));
+      renderGrid('games', [...allGames, ...userGames]);
+      document.getElementById('games-controls').style.display = 'flex';
+    } catch (e) {
+      console.error('Failed to load games:', e);
+      renderGrid('games', getUserItems('games').map(g => ({ ...g, _user: true })));
+    }
+    document.getElementById('games-loader').style.display = 'none';
+    document.getElementById('games-controls').style.display = 'flex';
+  }
+
+  // Apps Loading
+  async function loadApps() {
+    try {
+      const res = await fetch('https://raw.githubusercontent.com/ten8mystery/Vertex-Gold/main/data/apps.json');
+      const data = await res.json();
+      
+      data.sort((a, b) => {
+        const ai = priorityApps.indexOf(a.name);
+        const bi = priorityApps.indexOf(b.name);
+        if (ai !== -1 && bi !== -1) return ai - bi;
+        if (ai !== -1) return -1;
+        if (bi !== -1) return 1;
+        return a.name.localeCompare(b.name);
+      });
+
+      allApps = data;
+      const userApps = getUserItems('apps').map(a => ({ ...a, _user: true }));
+      renderGrid('apps', [...allApps, ...userApps]);
+      document.getElementById('apps-controls').style.display = 'flex';
+    } catch (e) {
+      console.error('Failed to load apps:', e);
+      renderGrid('apps', getUserItems('apps').map(a => ({ ...a, _user: true })));
+    }
+    document.getElementById('apps-loader').style.display = 'none';
+    document.getElementById('apps-controls').style.display = 'flex';
+  }
+
+  // Generic Grid Renderer
+  function renderGrid(type, items) {
+    const grid = document.getElementById(type + '-grid');
+    grid.innerHTML = '';
+
+    if (!items.length) {
+      grid.innerHTML = `<div class="empty-state"><div class="empty-title">No ${type} yet</div><p class="empty-sub">Add a ${type.slice(0,-1)} to get started</p></div>`;
+      return;
+    }
+
+    // Suggest card
+    const suggestCard = document.createElement('a');
+    suggestCard.className = 'suggest-card';
+    suggestCard.href = 'https://forms.gle/MDYRDxPZKUTST9NNA';
+    suggestCard.target = '_blank';
+    suggestCard.innerHTML = `<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span class="suggest-label">Suggest ${type.slice(0,-1)}</span>`;
+    grid.appendChild(suggestCard);
+
+    // Add card
+    const addCard = document.createElement('div');
+    addCard.className = 'add-card';
+    addCard.onclick = () => openAddModal(type);
+    addCard.innerHTML = `<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span class="add-label">Add ${type.slice(0,-1)}</span>`;
+    grid.appendChild(addCard);
+
+    items.forEach((item, i) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.cssText = `animation:fade-up 0.4s ${i*0.03}s ease both`;
+      
+      const img = item.image || item.thumbnail;
+      card.innerHTML = img
+        ? `<img class="card-thumb" src="${img}" alt="${item.name || item.title}" loading="lazy"/>
+           <div class="card-overlay"><div class="card-play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><div class="card-title">${item.name || item.title}</div></div>`
+        : `<div class="card-no-thumb"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/></svg></div>
+           <div class="card-overlay"><div class="card-play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><div class="card-title">${item.name || item.title}</div></div>`;
+      
+      card.onclick = () => openPlayer(item, type);
+      
+      if (item._user) {
+        const del = document.createElement('button');
+        del.className = 'card-delete';
+        del.innerHTML = '✕';
+        del.onclick = (e) => { e.stopPropagation(); deleteUserItem(type, item.id); };
+        card.appendChild(del);
+      }
+      
+      grid.appendChild(card);
+    });
+  }
+
+  // Player Functions
+  function openPlayer(item, type) {
+    document.getElementById('player-title').textContent = item.name || item.title;
+    document.getElementById('player-meta').textContent = type === 'games' ? 'Game' : 'App';
+    document.getElementById('player-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    
+    const iframe = document.getElementById('player-iframe');
+    
+    if (item.src) {
+      fetch(item.src)
+        .then(r => r.text())
+        .then(html => {
+          const doc = iframe.contentDocument || iframe.contentWindow.document;
+          doc.open();
+          doc.write(html);
+          doc.close();
+        })
+        .catch(() => {
+          iframe.srcdoc = `<h2 style="color:#ffe08a;padding:20px;text-align:center;">Failed to load</h2>`;
+        });
+    } else if (item.url) {
+      iframe.src = item.url;
+    } else if (item.blobContent) {
+      const blob = new Blob([item.blobContent], { type: 'text/html' });
+      iframe.src = URL.createObjectURL(blob);
+    }
+  }
+
+  function closePlayer() {
+    document.getElementById('player-modal').classList.remove('open');
+    document.getElementById('player-iframe').src = 'about:blank';
+    document.body.style.overflow = '';
+  }
+
+  function fullscreenPlayer() {
+    const el = document.getElementById('player-iframe');
+    if (el.requestFullscreen) el.requestFullscreen();
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  }
+
+  // Add Modal Functions
+  function openAddModal(type) {
+    currentAddType = type;
+    document.getElementById('add-modal-title').textContent = 'Add ' + type.slice(0,-1);
+    document.getElementById('add-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeAddModal() {
+    document.getElementById('add-modal').classList.remove('open');
+    document.body.style.overflow = '';
+    // Reset
+    document.getElementById('add-url').value = '';
+    document.getElementById('add-title').value = '';
+    document.getElementById('add-thumb-url').value = '';
+    document.getElementById('add-paste').value = '';
+    document.getElementById('upload-chosen').textContent = '';
+    uploadedFileContent = null;
+    thumbDataUrl = null;
+    switchAddTab('url');
+    document.getElementById('thumb-preview').innerHTML = '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
+  }
+
+  function switchAddTab(tab) {
+    addTab = tab;
+    document.querySelectorAll('.add-tab').forEach((t, i) => {
+      t.classList.toggle('active', ['url','upload','paste'][i] === tab);
+    });
+    document.querySelectorAll('.add-pane').forEach(p => p.classList.remove('active'));
+    document.getElementById('add-pane-' + tab).classList.add('active');
+  }
+
+  function onFileChosen(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    document.getElementById('upload-chosen').textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = ev => { uploadedFileContent = ev.target.result; };
+    reader.readAsText(file);
+    if (!document.getElementById('add-title').value) {
+      document.getElementById('add-title').value = file.name.replace(/\.html?$/i, '').replace(/[-_]/g, ' ');
+    }
+  }
+
+  function onThumbFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      thumbDataUrl = ev.target.result;
+      document.getElementById('thumb-preview').innerHTML = '<img src="' + thumbDataUrl + '" />';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function previewThumb() {
+    const url = document.getElementById('add-thumb-url').value.trim();
+    if (url) {
+      thumbDataUrl = null;
+      document.getElementById('thumb-preview').innerHTML = '<img src="' + url + '" onerror="this.style.display=\'none\'" />';
+    }
+  }
+
+  function getUserItems(type) {
+    try { return JSON.parse(localStorage.getItem('vertexgold_' + type) || '[]'); }
+    catch { return []; }
+  }
+
+  function saveUserItems(type, items) {
+    localStorage.setItem('vertexgold_' + type, JSON.stringify(items));
+  }
+
+  function deleteUserItem(type, id) {
+    const items = getUserItems(type).filter(i => i.id !== id);
+    saveUserItems(type, items);
+    if (type === 'games') {
+      const userGames = items.map(g => ({ ...g, _user: true }));
+      renderGrid('games', [...allGames, ...userGames]);
+    } else {
+      const userApps = items.map(a => ({ ...a, _user: true }));
+      renderGrid('apps', [...allApps, ...userApps]);
+    }
+  }
+
+  function saveItem() {
+    const title = document.getElementById('add-title').value.trim();
+    if (!title) { alert('Please enter a title.'); return; }
+    
+    const thumbUrl = thumbDataUrl || document.getElementById('add-thumb-url').value.trim() || null;
+    const id = 'user-' + Date.now();
+    const item = { id, title, thumbnail: thumbUrl, _user: true };
+
+    if (addTab === 'url') {
+      const url = document.getElementById('add-url').value.trim();
+      if (!url) { alert('Please enter a URL.'); return; }
+      item.url = url;
+    } else if (addTab === 'upload') {
+      if (!uploadedFileContent) { alert('Please choose an HTML file.'); return; }
+      item.blobContent = uploadedFileContent;
+    } else if (addTab === 'paste') {
+      const html = document.getElementById('add-paste').value.trim();
+      if (!html) { alert('Please paste some HTML.'); return; }
+      item.blobContent = html;
+    }
+
+    const existing = getUserItems(currentAddType);
+    existing.push(item);
+    saveUserItems(currentAddType, existing);
+    closeAddModal();
+    
+    if (currentAddType === 'games') {
+      const userGames = existing.map(g => ({ ...g, _user: true }));
+      renderGrid('games', [...allGames, ...userGames]);
+    } else {
+      const userApps = existing.map(a => ({ ...a, _user: true }));
+      renderGrid('apps', [...allApps, ...userApps]);
+    }
+  }
+
+  // Search Functions
+  document.getElementById('games-search').addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase();
+    const userGames = getUserItems('games').map(g => ({ ...g, _user: true, name: g.title }));
+    const all = [...allGames, ...userGames];
+    const filtered = q ? all.filter(g => (g.name || g.title).toLowerCase().includes(q)) : all;
+    renderGrid('games', filtered);
+  });
+
+  document.getElementById('apps-search').addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase();
+    const userApps = getUserItems('apps').map(a => ({ ...a, _user: true, name: a.title }));
+    const all = [...allApps, ...userApps];
+    const filtered = q ? all.filter(a => (a.name || a.title).toLowerCase().includes(q)) : all;
+    renderGrid('apps', filtered);
+  });
+
+  // Media Functions
+  async function fetchTMDB(path) {
+    const sep = path.includes('?') ? '&' : '?';
+    const res = await fetch(`${TMDB_BASE}${path}${sep}api_key=${API_KEY}`);
+    if (!res.ok) throw new Error('TMDB ' + res.status);
+    return res.json();
+  }
+
+  async function loadMedia() {
+    if (document.getElementById('media-grid').children.length > 0) return;
+    await fetchMedia();
+  }
+
+  async function fetchMedia() {
+    document.getElementById('media-loader').style.display = 'flex';
+    document.getElementById('media-grid').innerHTML = '';
+    
+    try {
+      let data;
+      if (currentMediaQuery) {
+        data = await fetchTMDB(`/search/multi?query=${encodeURIComponent(currentMediaQuery)}&page=${currentMediaPage}&include_adult=false`);
+      } else if (currentMediaTab === 'trending') {
+        data = await fetchTMDB(`/trending/all/week?page=${currentMediaPage}`);
+      } else {
+        data = await fetchTMDB(`/discover/${currentMediaTab}?sort_by=popularity.desc&page=${currentMediaPage}`);
+      }
+      
+      totalMediaPages = Math.min(data.total_pages || 1, 500);
+      renderMediaGrid(data.results || []);
+      renderMediaPagination();
+    } catch (e) {
+      document.getElementById('media-loader').style.display = 'none';
+      document.getElementById('media-grid').innerHTML = `<div class="empty-state"><div class="empty-title">Error</div><p class="empty-sub">${e.message}</p></div>`;
+    }
+  }
+
+  function renderMediaGrid(items) {
+    const grid = document.getElementById('media-grid');
+    document.getElementById('media-loader').style.display = 'none';
+    grid.innerHTML = '';
+    
+    items.filter(i => i.media_type !== 'person').forEach((item, idx) => {
+      const type = item.media_type || currentMediaTab;
+      const title = item.title || item.name || 'Unknown';
+      const year = (item.release_date || item.first_air_date || '').slice(0,4);
+      const rating = item.vote_average ? item.vote_average.toFixed(1) : '';
+      
+      const card = document.createElement('div');
+      card.className = 'movie-card';
+      card.style.cssText = `animation:fade-up 0.4s ${idx*0.02}s ease both`;
+      
+      if (item.poster_path) {
+        card.innerHTML = `
+          <img class="movie-poster" src="${IMG_BASE}${item.poster_path}" alt="${title}" loading="lazy"/>
+          ${rating ? `<div class="movie-rating">★ ${rating}</div>` : ''}
+          <div class="movie-overlay">
+            <div class="movie-play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
+            <div class="movie-title-overlay">${title}</div>
+            ${year ? `<div class="movie-year-overlay">${year}</div>` : ''}
+          </div>`;
+      } else {
+        card.innerHTML = `<div class="movie-no-poster"><span>${title}</span>${year?`<span>${year}</span>`:''}</div>`;
+      }
+      
+      card.onclick = () => openMediaPlayer(item.id, type, title, year, rating);
+      grid.appendChild(card);
+    });
+    
+    if (!grid.children.length) {
+      grid.innerHTML = `<div class="empty-state"><div class="empty-title">No results</div></div>`;
+    }
+  }
+
+  function openMediaPlayer(tmdbId, type, title, year, rating) {
+    activeTmdbId = tmdbId;
+    activeSeason = 1;
+    activeEpisode = 1;
+    activeTitle = title;
+
+    document.getElementById('media-modal-title').textContent = title;
+    document.getElementById('media-modal-meta').textContent = [year, rating ? '★ '+rating : '', type==='tv'?'TV Show':'Movie'].filter(Boolean).join(' · ');
+    document.getElementById('media-loading').style.display = 'flex';
+    document.getElementById('media-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    if (type === 'tv') {
+      document.getElementById('episode-sidebar').classList.remove('hidden');
+      document.getElementById('episode-list').innerHTML = '<div class="ep-loading">Loading seasons...</div>';
+      loadSeasons(tmdbId);
+    } else {
+      document.getElementById('episode-sidebar').classList.add('hidden');
+      playMovie(tmdbId);
+    }
+  }
+
+  function playMovie(tmdbId) {
+    const url = `https://cinemaos.tech/player/${tmdbId}`;
+    loadMediaIframe(proxyUrl(url));
+  }
+
+  async function loadSeasons(tmdbId) {
+    const sel = document.getElementById('season-select');
+    sel.innerHTML = '';
+    try {
+      const data = await fetchTMDB(`/tv/${tmdbId}?language=en-US`);
+      const seasons = (data.seasons || [])
+        .filter(s => s.season_number > 0 && s.episode_count > 0)
+        .sort((a, b) => a.season_number - b.season_number);
+
+      seasons.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.season_number;
+        opt.textContent = `Season ${s.season_number}`;
+        sel.appendChild(opt);
+      });
+
+      activeSeason = seasons[0]?.season_number || 1;
+      sel.value = activeSeason;
+      await loadEpisodes(activeSeason);
+    } catch(e) {
+      document.getElementById('episode-list').innerHTML = '<div class="ep-loading">Failed to load.</div>';
+    }
+  }
+
+  async function onSeasonChange() {
+    activeSeason = parseInt(document.getElementById('season-select').value);
+    activeEpisode = 1;
+    document.getElementById('episode-list').innerHTML = '<div class="ep-loading">Loading...</div>';
+    await loadEpisodes(activeSeason);
+    playTv(activeTmdbId, activeSeason, 1);
+  }
+
+  async function loadEpisodes(seasonNum) {
+    const list = document.getElementById('episode-list');
+    try {
+      const data = await fetchTMDB(`/tv/${activeTmdbId}/season/${seasonNum}?language=en-US`);
+      const eps = (data.episodes || []);
+      list.innerHTML = '';
+      eps.forEach(ep => {
+        const div = document.createElement('div');
+        div.className = 'ep-item' + (ep.episode_number === activeEpisode ? ' active' : '');
+        div.id = `ep-${seasonNum}-${ep.episode_number}`;
+        div.innerHTML = `
+          <span class="ep-num">E${String(ep.episode_number).padStart(2,'0')}</span>
+          <div class="ep-info">
+            <div class="ep-name">${ep.name || 'Episode '+ep.episode_number}</div>
+            ${ep.air_date ? `<div class="ep-air">${ep.air_date}</div>` : ''}
+          </div>
+          <div class="ep-play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>`;
+        div.onclick = () => selectEpisode(ep.episode_number);
+        list.appendChild(div);
+      });
+      const activeEl = list.querySelector('.active');
+      if (activeEl) activeEl.scrollIntoView({ block: 'nearest' });
+    } catch(e) {
+      list.innerHTML = '<div class="ep-loading">Failed to load episodes.</div>';
+    }
+  }
+
+  function selectEpisode(epNum) {
+    activeEpisode = epNum;
+    document.querySelectorAll('.ep-item').forEach(el => el.classList.remove('active'));
+    const el = document.getElementById(`ep-${activeSeason}-${epNum}`);
+    if (el) { el.classList.add('active'); el.scrollIntoView({ block: 'nearest' }); }
+    playTv(activeTmdbId, activeSeason, epNum);
+    document.getElementById('media-modal-meta').textContent = `${activeTitle} · S${String(activeSeason).padStart(2,'0')}E${String(epNum).padStart(2,'0')}`;
+  }
+
+  function playTv(tmdbId, season, episode) {
+    const url = `https://cinemaos.tech/player/${tmdbId}/${season}/${episode}`;
+    loadMediaIframe(proxyUrl(url));
+  }
+
+  function loadMediaIframe(src) {
+    if (!src) return;
+    document.getElementById('media-loading').style.display = 'flex';
+    const iframe = document.getElementById('media-iframe');
+    iframe.onload = () => { document.getElementById('media-loading').style.display = 'none'; };
+    setTimeout(() => { iframe.src = src; }, 50);
+  }
+
+  function closeMedia() {
+    document.getElementById('media-modal').classList.remove('open');
+    document.getElementById('media-iframe').src = '';
+    document.body.style.overflow = '';
+  }
+
+  function fullscreenMedia() {
+    const el = document.getElementById('media-iframe');
+    if (el.requestFullscreen) el.requestFullscreen();
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  }
+
+  function switchMediaTab(btn, tab) {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentMediaTab = tab;
+    currentMediaPage = 1;
+    currentMediaQuery = '';
+    document.getElementById('media-search').value = '';
+    fetchMedia();
+  }
+
+  function doMediaSearch() {
+    const q = document.getElementById('media-search').value.trim();
+    if (!q) return;
+    currentMediaQuery = q;
+    currentMediaPage = 1;
+    fetchMedia();
+  }
+
+  function changeMediaPage(dir) {
+    currentMediaPage = Math.max(1, Math.min(totalMediaPages, currentMediaPage + dir));
+    fetchMedia();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function renderMediaPagination() {
+    const el = document.getElementById('media-pagination');
+    el.style.display = 'flex';
+    document.getElementById('media-page-info').textContent = `Page ${currentMediaPage} of ${totalMediaPages}`;
+    document.getElementById('media-prev').disabled = currentMediaPage <= 1;
+    document.getElementById('media-next').disabled = currentMediaPage >= totalMediaPages;
+  }
+
+  function proxyUrl(url) {
+    if (typeof __uv$config !== 'undefined') {
+      return __uv$config.prefix + __uv$config.encodeUrl(url);
+    }
+    return '/uv/service/' + encodeURIComponent(url);
+  }
+
+  // Settings
+  function setBackground(type) {
+    localStorage.setItem('vertexgold_bg', type);
+    if (type === 'minimal') {
+      document.getElementById('particles').style.display = 'none';
+    } else {
+      document.getElementById('particles').style.display = 'block';
+    }
+  }
+
+  function clearUserData() {
+    if (confirm('Clear all user-added games and apps?')) {
+      localStorage.removeItem('vertexgold_games');
+      localStorage.removeItem('vertexgold_apps');
+      allGames = [];
+      allApps = [];
+      loadGames();
+      loadApps();
+    }
+  }
+
+  // Init
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closePlayer();
+      closeMedia();
+      closeAddModal();
+    }
+    if (e.key === 'Enter' && currentPage === 'media') doMediaSearch();
+  });
+
+  // Load saved background preference
+  const savedBg = localStorage.getItem('vertexgold_bg');
+  if (savedBg === 'minimal') {
+    document.getElementById('particles').style.display = 'none';
+  }
+
+  // Initial load
+  loadGames();
+</script>
+
+</body>
+</html>
